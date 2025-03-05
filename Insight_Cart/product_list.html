@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scraped Products</title>
+</head>
+<body>
+    <h1>Scraped Products</h1>
+    <form method="get">
+        <input type="text" name="query" placeholder="Enter product name">
+        <button type="submit">Search</button>
+    </form>
+    <ul>
+        {% for product in products %}
+        <li>
+            <strong>{{ product.title }}</strong><br>
+            Price: {{ product.price }}<br>
+            Rating: {{ product.rating }}<br>
+            <a href="{{ product.link }}" target="_blank">View Product</a>
+        </li>
+        <hr>
+        {% endfor %}
+    </ul>
+</body>
+</html>

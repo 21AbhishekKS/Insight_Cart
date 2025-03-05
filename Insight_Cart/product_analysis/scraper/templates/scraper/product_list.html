@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insight Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-form {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .search-form input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .search-form button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .button-container button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .product-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f8f8f8;
+            color: #333;
+        }
+
+        table a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        table a:hover {
+            text-decoration: underline;
+        }
+        
+        .loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 1000;
+    text-align: center;
+}
+
+#lottie-loader {
+        width: 200px; /* Set desired size */
+        height: 200px; /* Set desired size */
+    }
+
+
+    </style>
+    <script>
+        function showSection(sectionId) {
+            // Hide all product sections
+            document.querySelectorAll('.product-section').forEach(function(section) {
+                section.style.display = 'none';
+            });
+            // Show the selected section
+            document.getElementById(sectionId).style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Insight Cart</h1>
+        <h2>Your One-Stop Product Analysis</h2>
+
+        <!-- Search Form -->
+        <div class="search-form">
+            <form action="" method="get" onsubmit="showLoader()">
+                <input type="text" name="query" placeholder="Search for products" value="{{ request.GET.query }}">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+        
+        <!-- Loader -->
+        <div id="loader" class="loader" style="display: none;">
+            <div id="lottie-loader" ></div>
+        </div>
+        
+        <!-- Lottie Library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.1/lottie.min.js"></script> 
+
+        
+        <!-- Script -->
+        <script>
+            function showLoader() {
+                // Show the loader when the form is submitted
+                document.getElementById('loader').style.display = 'block';
+            }
+        
+            // Hide loader when the page is fully loaded
+            window.addEventListener('load', function () {
+                document.getElementById('loader').style.display = 'none';
+            });
+        
+            // Load the Lottie animation
+            lottie.loadAnimation({
+    container: document.getElementById('lottie-loader'),
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: 'https://lottie.host/89007ee2-cdb4-4c9b-93ca-ba6d54f8901e/qTfhn85Hn6.json' // Relative path to the downloaded JSON file
+});
+
+        </script>
+        
+        
+
+        <!-- Buttons to toggle between different sections -->
+        <div class="button-container">
+            <button onclick="showSection('amazon-section')">Amazon Products</button>
+            <button onclick="showSection('ebay-section')">eBay Products</button>
+            <button onclick="showSection('snapdeal-section')">Snapdeal Products</button>
+            <button onclick="showSection('ajio-section')">Ajio Products</button>
+            
+            <button onclick="showSection('top3-section')">Best 3 Products</button>
+            
+            <button onclick="showSection('price-prediction')">Price Prediction</button>
+    </div>
+
+<!--  
+    <div id="price-prediction" class="product-section">
+        <h1>Price Prediction</h1>
+        {% if graph_amazon %}
+    <img src="data:image/png;base64,{{ graph_amazon }}" alt="Amazon Price Visualization">
+{% endif %}
+{% if future_amazon_prices %}
+    <h3>Amazon Future Price Predictions:</h3>
+    <ul>
+        {% for price in future_amazon_prices %}
+            <li>{{ price }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% if graph_ajio %}
+    <img src="data:image/png;base64,{{ graph_ajio }}" alt="Ajio Price Visualization">
+{% endif %}
+{% if future_ajio_prices %}
+    <h3>Ajio Future Price Predictions:</h3>
+    <ul>
+        {% for price in future_ajio_prices %}
+            <li>{{ price }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% if graph_ebay %}
+    <img src="data:image/png;base64,{{ graph_ebay }}" alt="eBay Price Visualization">
+{% endif %}
+{% if future_ebay_prices %}
+    <h3>Ebay Future Price Predictions:</h3>
+    <ul>
+        {% for price in future_ebay_prices %}
+            <li>{{ price }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% if graph_snapdeal %}
+    <img src="data:image/png;base64,{{ graph_snapdeal }}" alt="Snapdeal Price Visualization">
+{% endif %}
+{% if future_snapdeal_prices %}
+    <h3>Snapdeal Future Price Predictions:</h3>
+    <ul>
+        {% for price in future_snapdeal_prices %}
+            <li>{{ price }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+    </div> --><!-- Button for Top 3 -->
+
+<!-- Graph Section -->
+<div id="price-prediction" class="product-section" style="padding: 20px; background-color: #f9f9f9;">
+    <h1 style="text-align: center; font-size: 36px; color: #333;">Price Prediction Analysis</h1>
+
+    <!-- Amazon Section -->
+    {% if graph_amazon %}
+    <div class="price-graph">
+        <h2 style="font-size: 28px; color: #0066cc;">Amazon Price Visualization</h2>
+        <img src="data:image/png;base64,{{ graph_amazon }}" alt="Amazon Price Visualization" style="width: 100%; max-width: 800px; border: 2px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    </div>
+    {% endif %}
+
+    {% if future_amazon_prices %}
+    <div class="price-predictions">
+        <h3 style="font-size: 24px; color: #333;">Amazon Future Price Predictions:</h3>
+        <ul style="list-style-type: none; padding: 0; font-size: 18px; color: #555;">
+            {% for price in future_amazon_prices %}
+            <li style="margin: 5px 0; padding: 5px 0; border-bottom: 1px solid #ddd;">{{ price|floatformat:0 }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Ajio Section -->
+    {% if graph_ajio %}
+    <div class="price-graph">
+        <h2 style="font-size: 28px; color: #ff6600;">Ajio Price Visualization</h2>
+        <img src="data:image/png;base64,{{ graph_ajio }}" alt="Ajio Price Visualization" style="width: 100%; max-width: 800px; border: 2px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    </div>
+    {% endif %}
+
+    {% if future_ajio_prices %}
+    <div class="price-predictions">
+        <h3 style="font-size: 24px; color: #333;">Ajio Future Price Predictions:</h3>
+        <ul style="list-style-type: none; padding: 0; font-size: 18px; color: #555;">
+            {% for price in future_ajio_prices %}
+            <li style="margin: 5px 0; padding: 5px 0; border-bottom: 1px solid #ddd;">{{ price|floatformat:0 }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- eBay Section -->
+    {% if graph_ebay %}
+    <div class="price-graph">
+        <h2 style="font-size: 28px; color: #0077b5;">eBay Price Visualization</h2>
+        <img src="data:image/png;base64,{{ graph_ebay }}" alt="eBay Price Visualization" style="width: 100%; max-width: 800px; border: 2px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    </div>
+    {% endif %}
+
+    {% if future_ebay_prices %}
+    <div class="price-predictions">
+        <h3 style="font-size: 24px; color: #333;">eBay Future Price Predictions:</h3>
+        <ul style="list-style-type: none; padding: 0; font-size: 18px; color: #555;">
+            {% for price in future_ebay_prices %}
+            <li style="margin: 5px 0; padding: 5px 0; border-bottom: 1px solid #ddd;">{{ price|floatformat:0 }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Snapdeal Section -->
+    {% if graph_snapdeal %}
+    <div class="price-graph">
+        <h2 style="font-size: 28px; color: #ff4444;">Snapdeal Price Visualization</h2>
+        <img src="data:image/png;base64,{{ graph_snapdeal }}" alt="Snapdeal Price Visualization" style="width: 100%; max-width: 800px; border: 2px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    </div>
+    {% endif %}
+
+    {% if future_snapdeal_prices %}
+    <div class="price-predictions">
+        <h3 style="font-size: 24px; color: #333;">Snapdeal Future Price Predictions:</h3>
+        <ul style="list-style-type: none; padding: 0; font-size: 18px; color: #555;">
+            {% for price in future_snapdeal_prices %}
+            <li style="margin: 5px 0; padding: 5px 0; border-bottom: 1px solid #ddd;">{{ price|floatformat:0 }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+        
+
+        <!-- Top 3 Products Section -->
+        <div id="top3-section" class="product-section">
+            <h1>Best 3 Products</h1>
+            
+            <h2>Amazon</h2>
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                    
+                    <th>Link</th>
+                </tr>
+                {% for product in top_3_amazon %}
+                <tr>
+                    <td>{{ product.title }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.rating }}</td>
+                    
+                    <td><a href="{{ product.link }}" target="_blank">View Product</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <h2>eBay</h2>
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                   
+                    <th>Link</th>
+                </tr>
+                {% for product in top_3_ebay %}
+                <tr>
+                    <td>{{ product.title }}</td>
+                    <td>{{ product.price |floatformat:0 }}</td>
+                    <td>{{ product.rating }}</td>
+                    
+                    <td><a href="{{ product.link }}" target="_blank">View Product</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <h2>Snapdeal</h2>
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                    
+                    <th>Link</th>
+                </tr>
+                {% for product in top_3_snapdeal %}
+                <tr>
+                    <td>{{ product.title }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.rating |floatformat:1 }}</td>
+                   
+                    <td><a href="{{ product.link }}" target="_blank">View Product</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <h2>Ajio</h2>
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                    
+                    <th>Link</th>
+                </tr>
+                {% for product in top_3_ajio %}
+                <tr>
+                    <td>{{ product.title }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.rating }}</td>
+                  
+                    <td><a href="{{ product.link }}" target="_blank">View Product</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- Amazon Products Section -->
+        <div id="amazon-section" class="product-section">
+            <h1>Amazon Products</h1>
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                    <th>Link</th>
+                </tr>
+                {% for product in amazon_products %}
+                <tr>
+                    <td>{{ product.title }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.rating }}</td>
+                    <td><a href="{{ product.link }}" target="_blank">View Product</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- eBay Products Section -->
+        <div id="ebay-section" class="product-section">
+            <h1>eBay Products</h1>
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                    <th>Link</th>
+                </tr>
+                {% for product in ebay_products %}
+                <tr>
+                    <td>{{ product.title }}</td>
+                    <td>{{ product.price |floatformat:0 }}</td>
+                    <td>{{ product.rating }}</td>
+                    <td><a href="{{ product.link }}" target="_blank">View Product</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- Snapdeal Products Section -->
+        <div id="snapdeal-section" class="product-section">
+            <h1>Snapdeal Products</h1>
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                    <th>Link</th>
+                </tr>
+                {% for product in snapdeal_products %}
+                <tr>
+                    <td>{{ product.title }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.rating |floatformat:1 }}</td>
+                    <td><a href="{{ product.link }}" target="_blank">View Product</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- Ajio Products Section -->
+        <div id="ajio-section" class="product-section">
+            <h1>Ajio Products</h1>
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                    <th>Link</th>
+                </tr>
+                {% for product in ajio_products %}
+                <tr>
+                    <td>{{ product.title }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.rating }}</td>
+                    <td><a href="{{ product.link }}" target="_blank">View Product</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+</html>
